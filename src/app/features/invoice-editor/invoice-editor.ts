@@ -21,12 +21,13 @@ import { ToastService } from '../../core/services/toast.service';
 import { addDays, toIsoDate } from '../../core/utils/format';
 import { calculateTotals, lineTotal } from '../../core/utils/invoice-calc';
 import { Icon } from '../../shared/components/icon/icon';
+import { InvoicePreview } from '../../shared/components/invoice-preview/invoice-preview';
 import { MoneyPipe } from '../../shared/pipes/money.pipe';
 import { InvoiceForm, InvoiceFormFactory, formToDraft } from './invoice-form';
 
 @Component({
   selector: 'app-invoice-editor',
-  imports: [ReactiveFormsModule, RouterLink, TitleCasePipe, Icon, MoneyPipe],
+  imports: [ReactiveFormsModule, RouterLink, TitleCasePipe, Icon, InvoicePreview, MoneyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './invoice-editor.html',
   styleUrl: './invoice-editor.scss',
@@ -124,6 +125,10 @@ export class InvoiceEditor implements OnDestroy, HasUnsavedChanges {
       this.toast.show(`Created ${copy.number} as a copy`);
       this.router.navigate(['/invoices', copy.id]);
     }
+  }
+
+  protected print(): void {
+    window.print();
   }
 
   /** Used by the route guard to warn about unsaved edits. */

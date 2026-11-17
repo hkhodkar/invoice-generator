@@ -1,0 +1,86 @@
+@let inv = invoice();
+<article class="paper">
+  <header class="paper__head">
+    <div class="sender">
+      <h2 class="sender__name">{{ inv.from.name || 'Your business' }}</h2>
+      @if (inv.from.address) {
+        <p class="pre">{{ inv.from.address }}</p>
+      }
+      <p>
+        @if (inv.from.email) { <span>{{ inv.from.email }}</span> }
+        @if (inv.from.phone) { <span>{{ inv.from.phone }}</span> }
+        @if (inv.from.taxId) { <span>{{ inv.from.taxId }}</span> }
+      </p>
+    </div>
+    <div class="doc-title">
+      <h1>Invoice</h1>
+      <p class="doc-title__number">{{ inv.number || '—' }}</p>
+      @if (inv.status === 'paid') {
+        <span class="stamp">Paid</span>
+      }
+    </div>
+  </header>
+
+  <section class="paper__meta">
+    <div>
+      <h3 class="label">Bill to</h3>
+      <p class="strong">{{ inv.to.name || 'Client name' }}</p>
+      @if (inv.to.address) {
+        <p class="pre">{{ inv.to.address }}</p>
+      }
+      @if (inv.to.email) { <p>{{ inv.to.email }}</p> }
+      @if (inv.to.taxId) { <p>{{ inv.to.taxId }}</p> }
+    </div>
+    <dl class="dates">
+      <div><dt class="label">Issue date</dt><dd>{{ inv.issueDate | shortDate }}</dd></div>
+      <div><dt class="label">Due date</dt><dd>{{ inv.dueDate | shortDate }}</dd></div>
+      <div class="dates__due">
+        <dt class="label">Amount due</dt>
+        <dd>{{ (inv.status === 'paid' ? 0 : totals().total) | money: inv.currency }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <table class="lines">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th class="num">Qty</th>
+        <th class="num">Unit price</th>
+        <th class="num">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (line of lines(); track $index) {
+        <tr>
+          <td>{{ line.description || '—' }}</td>
+          <td class="num">{{ line.quantity }}</td>
+          <td class="num">{{ line.unitPrice | money: inv.currency }}</td>
+          <td class="num">{{ line.amount | money: inv.currency }}</td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="4" class="lines__empty">Add line items to see them here.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <dl class="sum">
+    <div><dt>Subtotal</dt><dd>{{ totals().subtotal | money: inv.currency }}</dd></div>
+    @if (totals().discount) {
+      <div><dt>{{ discountLabel() }}</dt><dd>−{{ totals().discount | money: inv.currency }}</dd></div>
+    }
+    @if (inv.taxRate) {
+      <div><dt>Tax ({{ inv.taxRate }}%)</dt><dd>{{ totals().tax | money: inv.currency }}</dd></div>
+    }
+    <div class="sum__total"><dt>Total ({{ inv.currency }})</dt><dd>{{ totals().total | money: inv.currency }}</dd></div>
+  </dl>
+
+  @if (inv.notes) {
+    <section class="notes">
+      <h3 class="label">Notes</h3>
+      <p class="pre">{{ inv.notes }}</p>
+    </section>
+  }
+</article>

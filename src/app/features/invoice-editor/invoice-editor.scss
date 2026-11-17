@@ -45,6 +45,33 @@
   align-items: start;
 }
 
+.editor__preview {
+  position: sticky;
+  top: 84px;
+  min-width: 0;
+}
+
+.preview-label {
+  margin-bottom: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 1200px) {
+  .editor {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  }
+}
+
+@media (max-width: 1199px) {
+  .editor__preview {
+    position: static;
+  }
+}
+
 .editor__form {
   display: flex;
   flex-direction: column;
@@ -54,6 +81,13 @@
 
 .section {
   padding: 20px;
+  container-type: inline-size;
+}
+
+@container (max-width: 330px) {
+  .grid--tight {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .section__title {
@@ -222,5 +256,27 @@
 
   .hide-sm {
     display: none;
+  }
+}
+
+// Only the invoice itself goes to the printer
+@media print {
+  .container {
+    padding: 0;
+  }
+
+  .toolbar,
+  .alert,
+  .editor__form,
+  .preview-label {
+    display: none !important;
+  }
+
+  .editor {
+    display: block;
+  }
+
+  .editor__preview {
+    position: static;
   }
 }

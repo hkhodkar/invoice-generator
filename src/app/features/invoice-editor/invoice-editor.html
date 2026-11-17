@@ -27,6 +27,10 @@
             <span class="hide-sm">Duplicate</span>
           </button>
         }
+        <button type="button" class="btn" (click)="print()">
+          <app-icon name="print" />
+          <span class="hide-sm">Print</span>
+        </button>
         <button type="button" class="btn btn--primary" (click)="save()">
           <app-icon name="save" />
           {{ isNew() ? 'Create invoice' : 'Save' }}
@@ -201,6 +205,11 @@
           </div>
         </section>
       </form>
+
+      <aside class="editor__preview">
+        <div class="preview-label">Live preview</div>
+        <app-invoice-preview [invoice]="draft()" />
+      </aside>
     </div>
   }
 </div>
