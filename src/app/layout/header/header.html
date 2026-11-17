@@ -1,0 +1,18 @@
+<header class="header">
+  <div class="container header__inner">
+    <a routerLink="/" class="brand">
+      <span class="brand__mark"><app-icon name="file" [size]="18" /></span>
+      <span class="brand__name">Invoice Generator</span>
+    </a>
+
+    <nav class="nav">
+      <a routerLink="/invoices" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
+        Invoices
+      </a>
+      <a routerLink="/invoices/new" class="btn btn--primary btn--sm">
+        <app-icon name="plus" [size]="15" />
+        <span>New invoice</span>
+      </a>
+    </nav>
+  </div>
+</header>

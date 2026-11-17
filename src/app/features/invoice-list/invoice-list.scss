@@ -1,0 +1,267 @@
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 24px;
+  }
+}
+
+.page-head__sub {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 16px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    border-color: var(--border-strong);
+  }
+
+  &.is-active {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary);
+  }
+}
+
+.stat__label {
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.stat__value {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.stat--alert .stat__value {
+  color: var(--danger);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.search {
+  position: relative;
+  flex: 1;
+  max-width: 340px;
+
+  .input {
+    padding-left: 34px;
+  }
+}
+
+.search__icon {
+  position: absolute;
+  top: 11px;
+  left: 11px;
+  color: var(--text-muted);
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  background: #f0f2f5;
+
+  button {
+    padding: 5px 12px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+
+    &.is-active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+    }
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 12px 16px;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  th {
+    background: var(--surface-muted);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  tbody tr {
+    border-top: 1px solid var(--border);
+    cursor: pointer;
+
+    &:hover {
+      background: #fafbfc;
+    }
+  }
+
+  .num {
+    text-align: right;
+  }
+}
+
+.cell-number,
+.client,
+.amount {
+  font-weight: 500;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.overdue {
+  color: var(--danger);
+}
+
+.table .actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.empty {
+  padding: 56px 24px;
+  text-align: center;
+
+  h3 {
+    font-size: 16px;
+  }
+
+  p {
+    margin: 6px 0 18px;
+    color: var(--text-muted);
+  }
+}
+
+.empty__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+@media (max-width: 960px) {
+  .stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+// On small screens every row becomes a compact card
+@media (max-width: 760px) {
+  .stats {
+    display: flex;
+    overflow-x: auto;
+    margin: 0 -16px 16px;
+    padding: 0 16px 4px;
+    scrollbar-width: none;
+  }
+
+  .stat {
+    flex: 0 0 132px;
+    padding: 10px 14px;
+  }
+
+  .stat__value {
+    font-size: 18px;
+  }
+
+  .search {
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .table {
+    thead {
+      display: none;
+    }
+
+    tbody tr {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        'number status'
+        'client amount'
+        'issued due'
+        'actions actions';
+      row-gap: 4px;
+      padding: 14px 16px 10px;
+    }
+
+    td {
+      padding: 0;
+    }
+
+    td[data-label='Invoice'] { grid-area: number; }
+    td[data-label='Status'] { grid-area: status; justify-self: end; }
+    td[data-label='Client'] { grid-area: client; }
+    td[data-label='Amount'] { grid-area: amount; align-self: start; }
+    td[data-label='Issued'] { grid-area: issued; }
+    td[data-label='Due'] { grid-area: due; text-align: right; }
+
+    td[data-label='Issued'],
+    td[data-label='Due'] {
+      font-size: 13px;
+
+      &::before {
+        content: attr(data-label) ' ';
+        color: var(--text-muted);
+      }
+    }
+
+    .actions {
+      grid-area: actions;
+      width: auto;
+      margin: 4px -8px 0;
+      text-align: left;
+    }
+  }
+}
