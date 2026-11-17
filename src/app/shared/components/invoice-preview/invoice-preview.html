@@ -2,7 +2,7 @@
 <article class="paper">
   <header class="paper__head">
     <div class="sender">
-      <h2 class="sender__name">{{ inv.from.name || 'Your business' }}</h2>
+      <h2 class="sender__name" [class.placeholder]="!inv.from.name">{{ inv.from.name || 'Your business' }}</h2>
       @if (inv.from.address) {
         <p class="pre">{{ inv.from.address }}</p>
       }
@@ -24,7 +24,7 @@
   <section class="paper__meta">
     <div>
       <h3 class="label">Bill to</h3>
-      <p class="strong">{{ inv.to.name || 'Client name' }}</p>
+      <p class="strong" [class.placeholder]="!inv.to.name">{{ inv.to.name || 'Client name' }}</p>
       @if (inv.to.address) {
         <p class="pre">{{ inv.to.address }}</p>
       }

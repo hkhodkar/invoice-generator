@@ -22,13 +22,14 @@ import { ToastService } from '../../core/services/toast.service';
 import { addDays, toIsoDate } from '../../core/utils/format';
 import { calculateTotals, lineTotal } from '../../core/utils/invoice-calc';
 import { Icon } from '../../shared/components/icon/icon';
+import { SelectOnFocus } from '../../shared/directives/select-on-focus';
 import { InvoicePreview } from '../../shared/components/invoice-preview/invoice-preview';
 import { MoneyPipe } from '../../shared/pipes/money.pipe';
 import { InvoiceForm, InvoiceFormFactory, formToDraft } from './invoice-form';
 
 @Component({
   selector: 'app-invoice-editor',
-  imports: [ReactiveFormsModule, RouterLink, TitleCasePipe, Icon, InvoicePreview, MoneyPipe],
+  imports: [ReactiveFormsModule, RouterLink, TitleCasePipe, Icon, InvoicePreview, MoneyPipe, SelectOnFocus],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './invoice-editor.html',
   styleUrl: './invoice-editor.scss',
