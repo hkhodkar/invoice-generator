@@ -17,6 +17,7 @@ import { Subscription } from 'rxjs';
 import { HasUnsavedChanges } from '../../core/guards/unsaved-changes.guard';
 import { CURRENCIES, INVOICE_STATUSES, InvoiceDraft, emptyParty, toDraft } from '../../core/models/invoice.model';
 import { InvoiceStore } from '../../core/services/invoice-store.service';
+import { PdfExportService } from '../../core/services/pdf-export.service';
 import { ToastService } from '../../core/services/toast.service';
 import { addDays, toIsoDate } from '../../core/utils/format';
 import { calculateTotals, lineTotal } from '../../core/utils/invoice-calc';
@@ -37,6 +38,7 @@ export class InvoiceEditor implements OnDestroy, HasUnsavedChanges {
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly formFactory = inject(InvoiceFormFactory);
+  private readonly pdf = inject(PdfExportService);
 
   /** Route param, undefined when creating a new invoice. */
   readonly id = input<string>();
@@ -53,6 +55,7 @@ export class InvoiceEditor implements OnDestroy, HasUnsavedChanges {
   protected readonly draft = signal<InvoiceDraft>(formToDraft(this.form()));
   protected readonly notFound = signal(false);
   protected readonly submitted = signal(false);
+  protected readonly exporting = signal(false);
 
   protected readonly isNew = computed(() => !this.id());
   protected readonly totals = computed(() => {
@@ -129,6 +132,18 @@ export class InvoiceEditor implements OnDestroy, HasUnsavedChanges {
 
   protected print(): void {
     window.print();
+  }
+
+  protected async downloadPdf(): Promise<void> {
+    this.exporting.set(true);
+    try {
+      await this.pdf.download(this.draft());
+    } catch (error) {
+      console.error(error);
+      this.toast.show('Could not generate the PDF, please try again');
+    } finally {
+      this.exporting.set(false);
+    }
   }
 
   /** Used by the route guard to warn about unsaved edits. */

@@ -31,6 +31,10 @@
           <app-icon name="print" />
           <span class="hide-sm">Print</span>
         </button>
+        <button type="button" class="btn" [disabled]="exporting()" (click)="downloadPdf()">
+          <app-icon name="download" />
+          <span class="hide-sm">{{ exporting() ? 'Preparing…' : 'PDF' }}</span>
+        </button>
         <button type="button" class="btn btn--primary" (click)="save()">
           <app-icon name="save" />
           {{ isNew() ? 'Create invoice' : 'Save' }}
