@@ -3,10 +3,11 @@ import { RouterOutlet } from '@angular/router';
 
 import { InvoiceStore } from './core/services/invoice-store.service';
 import { Header } from './layout/header/header';
+import { Toast } from './shared/components/toast/toast';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header],
+  imports: [RouterOutlet, Header, Toast],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.html',
   styleUrl: './app.scss',

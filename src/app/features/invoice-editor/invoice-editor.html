@@ -1,0 +1,206 @@
+<div class="container">
+  @if (notFound()) {
+    <div class="card not-found">
+      <h2>Invoice not found</h2>
+      <p>It may have been deleted, or it was created in another browser.</p>
+      <a routerLink="/invoices" class="btn">
+        <app-icon name="back" />
+        Back to invoices
+      </a>
+    </div>
+  } @else {
+    <div class="toolbar">
+      <div class="toolbar__title">
+        <a routerLink="/invoices" class="btn btn--ghost btn--icon" title="Back to invoices">
+          <app-icon name="back" [size]="18" />
+        </a>
+        <div>
+          <h1>{{ isNew() ? 'New invoice' : 'Edit invoice' }}</h1>
+          <p class="toolbar__sub">{{ draft().number || 'No number yet' }}</p>
+        </div>
+      </div>
+
+      <div class="toolbar__actions">
+        @if (!isNew()) {
+          <button type="button" class="btn" (click)="duplicate()">
+            <app-icon name="copy" />
+            <span class="hide-sm">Duplicate</span>
+          </button>
+        }
+        <button type="button" class="btn btn--primary" (click)="save()">
+          <app-icon name="save" />
+          {{ isNew() ? 'Create invoice' : 'Save' }}
+        </button>
+      </div>
+    </div>
+
+    @if (submitted() && form().invalid) {
+      <div class="alert" role="alert">Some fields need your attention before the invoice can be saved.</div>
+    }
+
+    <div class="editor">
+      <form class="editor__form" [formGroup]="form()" (ngSubmit)="save()" novalidate>
+        <section class="card section">
+          <h2 class="section__title">Invoice details</h2>
+          <div class="grid grid--3">
+            <label class="field">
+              <span>Invoice number</span>
+              <input class="input" formControlName="number" />
+              @if (invalid('number')) {
+                <small class="field-error">Invoice number is required</small>
+              }
+            </label>
+            <label class="field">
+              <span>Status</span>
+              <select class="select" formControlName="status">
+                @for (status of statuses; track status) {
+                  <option [value]="status">{{ status | titlecase }}</option>
+                }
+              </select>
+            </label>
+            <label class="field">
+              <span>Currency</span>
+              <select class="select" formControlName="currency">
+                @for (currency of currencies; track currency.code) {
+                  <option [value]="currency.code">{{ currency.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="field">
+              <span>Issue date</span>
+              <input class="input" type="date" formControlName="issueDate" />
+            </label>
+            <label class="field">
+              <span>Due date</span>
+              <input class="input" type="date" formControlName="dueDate" />
+              @if (form().hasError('dueBeforeIssue')) {
+                <small class="field-error">Due date can't be before the issue date</small>
+              }
+            </label>
+          </div>
+        </section>
+
+        <div class="grid grid--2">
+          @for (party of parties; track party.key) {
+            <section class="card section" [formGroupName]="party.key">
+              <h2 class="section__title">{{ party.title }}</h2>
+              <div class="stack">
+                <label class="field">
+                  <span>{{ party.nameLabel }}</span>
+                  <input class="input" formControlName="name" [placeholder]="party.namePlaceholder" />
+                  @if (invalid(party.key + '.name')) {
+                    <small class="field-error">Name is required</small>
+                  }
+                </label>
+                <label class="field">
+                  <span>Email</span>
+                  <input class="input" type="email" formControlName="email" placeholder="name@company.com" />
+                  @if (invalid(party.key + '.email')) {
+                    <small class="field-error">Enter a valid email address</small>
+                  }
+                </label>
+                <div class="grid grid--2 grid--tight">
+                  <label class="field">
+                    <span>Phone</span>
+                    <input class="input" formControlName="phone" />
+                  </label>
+                  <label class="field">
+                    <span>Tax / VAT ID</span>
+                    <input class="input" formControlName="taxId" />
+                  </label>
+                </div>
+                <label class="field">
+                  <span>Address</span>
+                  <textarea class="textarea" rows="3" formControlName="address"></textarea>
+                </label>
+              </div>
+            </section>
+          }
+        </div>
+
+        <section class="card section">
+          <h2 class="section__title">Line items</h2>
+
+          <div class="items" formArrayName="items">
+            <div class="items__head" aria-hidden="true">
+              <span>Description</span>
+              <span>Qty</span>
+              <span>Unit price</span>
+              <span class="num">Amount</span>
+              <span></span>
+            </div>
+
+            @for (item of items.controls; track item; let i = $index) {
+              <div class="item" [formGroupName]="i">
+                <label class="field item__desc">
+                  <span class="item__label">Description</span>
+                  <input class="input" formControlName="description" placeholder="What did you deliver?" />
+                </label>
+                <label class="field">
+                  <span class="item__label">Qty</span>
+                  <input class="input" type="number" min="0" step="any" formControlName="quantity" />
+                </label>
+                <label class="field">
+                  <span class="item__label">Unit price</span>
+                  <input class="input" type="number" min="0" step="0.01" formControlName="unitPrice" />
+                </label>
+                <div class="item__amount">{{ lineAmount(i) | money: draft().currency }}</div>
+                <button
+                  type="button"
+                  class="btn btn--ghost btn--icon btn--danger"
+                  title="Remove line"
+                  [disabled]="items.length === 1"
+                  (click)="removeItem(i)"
+                >
+                  <app-icon name="x" />
+                </button>
+              </div>
+            }
+          </div>
+
+          <button type="button" class="btn btn--sm add-item" (click)="addItem()">
+            <app-icon name="plus" [size]="14" />
+            Add line item
+          </button>
+        </section>
+
+        <section class="card section">
+          <h2 class="section__title">Tax, discount &amp; notes</h2>
+          <div class="summary">
+            <div class="stack">
+              <div class="grid grid--2 grid--tight">
+                <label class="field">
+                  <span>Tax rate (%)</span>
+                  <input class="input" type="number" min="0" max="100" step="0.1" formControlName="taxRate" />
+                </label>
+                <div class="field">
+                  <span>Discount</span>
+                  <div class="discount">
+                    <input class="input" type="number" min="0" step="0.01" formControlName="discount" aria-label="Discount" />
+                    <select class="select" formControlName="discountType" aria-label="Discount type">
+                      <option value="percent">%</option>
+                      <option value="amount">{{ draft().currency }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <label class="field">
+                <span>Notes / payment terms</span>
+                <textarea class="textarea" rows="3" formControlName="notes"></textarea>
+              </label>
+            </div>
+
+            <dl class="totals">
+              <div><dt>Subtotal</dt><dd>{{ totals().subtotal | money: draft().currency }}</dd></div>
+              @if (totals().discount) {
+                <div><dt>Discount</dt><dd>−{{ totals().discount | money: draft().currency }}</dd></div>
+              }
+              <div><dt>Tax ({{ draft().taxRate }}%)</dt><dd>{{ totals().tax | money: draft().currency }}</dd></div>
+              <div class="totals__grand"><dt>Total</dt><dd>{{ totals().total | money: draft().currency }}</dd></div>
+            </dl>
+          </div>
+        </section>
+      </form>
+    </div>
+  }
+</div>

@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { Invoice, InvoiceStatus } from '../../core/models/invoice.model';
 import { InvoiceStore } from '../../core/services/invoice-store.service';
+import { ToastService } from '../../core/services/toast.service';
 import { calculateTotals, isOverdue } from '../../core/utils/invoice-calc';
 import { Icon } from '../../shared/components/icon/icon';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
@@ -27,6 +28,7 @@ interface InvoiceRow {
 export class InvoiceList {
   private readonly store = inject(InvoiceStore);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
 
   protected readonly filterOptions: { value: StatusFilter; label: string }[] = [
     { value: 'all', label: 'All' },
@@ -80,16 +82,18 @@ export class InvoiceList {
 
   protected duplicate(invoice: Invoice): void {
     const copy = this.store.duplicate(invoice.id);
-    if (copy) this.router.navigate(['/invoices', copy.id]);
+    if (copy) this.toast.show(`Created ${copy.number} as a copy of ${invoice.number}`);
   }
 
   protected markPaid(invoice: Invoice): void {
     this.store.setStatus(invoice.id, 'paid');
+    this.toast.show(`${invoice.number} marked as paid`);
   }
 
   protected remove(invoice: Invoice): void {
     if (confirm(`Delete invoice ${invoice.number}? This can't be undone.`)) {
       this.store.remove(invoice.id);
+      this.toast.show(`${invoice.number} deleted`);
     }
   }
 
